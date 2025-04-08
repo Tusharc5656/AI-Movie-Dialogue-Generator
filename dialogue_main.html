@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Movie Dialogue Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: rgba(30, 30, 30, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h2 {
+            color: #ffcc00;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 3px solid #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+            display: inline-block;
+            width: auto;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffcc00, #ff9500);
+            color: #222;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ffd633, #ffaa33);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            margin: 20px 0;
+            color: #fff;
+            border-left: 3px solid #ffcc00;
+            min-height: 100px;
+        }
+        
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: #ffcc00;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .widgets {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .widget {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            width: 30%;
+            text-align: center;
+        }
+        
+        .widget i {
+            font-size: 24px;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .widget h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #ffcc00;
+        }
+        
+        .widget p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .character-icon {
+            font-size: 40px;
+            margin: 0 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .scene-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container fade-in">
+        <div class="scene-header">
+            <i class="character-icon fas fa-user-astronaut"></i>
+            <h2>🎬 AI Movie Dialogue Generator</h2>
+            <i class="character-icon fas fa-user-ninja"></i>
+        </div>
+        
+        <div class="widgets">
+            <div class="widget">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Creative Ideas</h3>
+                <p>Get inspired with unique dialogue concepts</p>
+            </div>
+            <div class="widget">
+                <i class="fas fa-film"></i>
+                <h3>Movie Magic</h3>
+                <p>Hollywood-quality dialogue in seconds</p>
+            </div>
+            <div class="widget">
+                <i class="fas fa-robot"></i>
+                <h3>AI Powered</h3>
+                <p>Cutting-edge language technology</p>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="situation" placeholder="Describe your movie scene (e.g., 'Two spies meet in a cafe to exchange secrets')">
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="generateDialogue()">
+                <i class="fas fa-magic"></i> Generate Dialogue
+            </button>
+        </div>
+        
+        <p id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Crafting  dialogue...
+        </p>
+        
+        <div id="dialogueBox" class="output"></div>
+        
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="continueDialogue()">
+                <i class="fas fa-plus-circle"></i> Continue Scene
+            </button>
+            <button class="btn btn-secondary" onclick="newScene()">
+                <i class="fas fa-redo"></i> New Scene
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let previousDialogue = "";
+
+        async function generateDialogue() {
+            const situation = document.getElementById("situation").value;
+            if (!situation) {
+                alert("Please enter a scene description!");
+                return;
+            }
+
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("dialogueBox").innerHTML = "";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ situation, previous_dialogue: previousDialogue })
+                });
+
+                const data = await response.json();
+                previousDialogue = data.text;
+
+                // Format the dialogue with character names in different colors
+                const formattedDialogue = data.text.split('\n').map(line => {
+                    if (line.includes(':')) {
+                        const parts = line.split(':');
+                        return `<strong style="color: #ffcc00">${parts[0]}:</strong><span style="color: #fff">${parts.slice(1).join(':')}</span>`;
+                    }
+                    return line;
+                }).join('<br><br>');
+
+                document.getElementById("dialogueBox").innerHTML = formattedDialogue;
+                document.getElementById("dialogueBox").classList.add("fade-in");
+            } catch (error) {
+                document.getElementById("dialogueBox").innerHTML = 
+                    `<strong style="color: #ff6666">Error:</strong> Could not generate dialogue. Please try again.`;
+            } finally {
+                document.getElementById("loading").style.display = "none";
+            }
+        }
+
+        function continueDialogue() {
+            if (!previousDialogue) {
+                alert("No dialogue to continue! Generate some dialogue first.");
+                return;
+            }
+            generateDialogue();
+        }
+
+        function newScene() {
+            previousDialogue = "";
+            document.getElementById("dialogueBox").innerHTML = "";
+            document.getElementById("situation").value = "";
+            document.getElementById("dialogueBox").classList.remove("fade-in");
+        }
+    </script>
+
+</body>
+</html>
